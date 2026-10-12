@@ -329,3 +329,29 @@ Le fichier est ensuite corrigé avec `terraform fmt -recursive`. Le contrôle lo
 | Premier push | `d6d58f2` | [Réussite](https://github.com/DOUIMIAGH/tp-iac/actions/runs/38248149242) |
 | Défaut de formatage volontaire | `c42d3c3` | [Échec de Format Check](https://github.com/DOUIMIAGH/tp-iac/actions/runs/38248326444) |
 | Correction du formatage | `1a03600` | [Réussite](https://github.com/DOUIMIAGH/tp-iac/actions/runs/38248491161) |
+
+### Exercice 7 — Nettoyage
+
+Le plan de destruction est examiné avant de supprimer les ressources :
+
+```bash
+terraform plan -destroy
+terraform destroy
+```
+
+Le plan affiche `0 to add, 0 to change, 3 to destroy` et concerne les trois ressources du projet. Après confirmation avec `yes`, Terraform affiche `Destroy complete! Resources: 3 destroyed.`
+
+Vérifications exécutées :
+
+```bash
+docker ps -a
+docker network ls
+terraform state list
+docker image inspect nginx:alpine --format '{{.Id}}'
+```
+
+Le conteneur `tp-iac-web` et le réseau `tp-iac-web-network` sont absents des listes Docker. `terraform state list` ne retourne aucune ressource. L'image `nginx:alpine` reste présente localement, conformément à `keep_locally = true`.
+
+**Pourquoi ne faut-il pas supprimer manuellement l'état Terraform pour nettoyer une infrastructure active ?**
+
+Supprimer le fichier d'état ne supprime pas les ressources réelles. Terraform perd la correspondance entre les ressources déclarées et leurs identifiants dans Docker ; il ne peut plus les gérer à partir de cet état. Une application ultérieure peut alors provoquer des conflits de noms ou des créations en double. Il faut examiner `terraform plan -destroy`, puis utiliser `terraform destroy` pour supprimer les ressources et mettre à jour l'état.
