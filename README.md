@@ -355,3 +355,11 @@ Le conteneur `tp-iac-web` et le réseau `tp-iac-web-network` sont absents des li
 **Pourquoi ne faut-il pas supprimer manuellement l'état Terraform pour nettoyer une infrastructure active ?**
 
 Supprimer le fichier d'état ne supprime pas les ressources réelles. Terraform perd la correspondance entre les ressources déclarées et leurs identifiants dans Docker ; il ne peut plus les gérer à partir de cet état. Une application ultérieure peut alors provoquer des conflits de noms ou des créations en double. Il faut examiner `terraform plan -destroy`, puis utiliser `terraform destroy` pour supprimer les ressources et mettre à jour l'état.
+
+## 20. Questions de compréhension
+
+### 1. Quelle est la différence entre `terraform init`, `terraform plan` et `terraform apply` ?
+
+- `terraform init` prépare le répertoire de travail : il installe les providers nécessaires et initialise le stockage de l'état.
+- `terraform plan` compare la configuration à l'état connu et aux ressources réelles, puis présente les créations, modifications et suppressions prévues, sans déployer l'infrastructure.
+- `terraform apply` exécute les actions du plan pour créer, modifier ou supprimer les ressources et mettre à jour l'état.
