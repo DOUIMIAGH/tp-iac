@@ -206,3 +206,25 @@ docker image inspect nginx:alpine --format '{{.Id}}'
 Le conteneur `tp-iac-dev` et le réseau `tp-iac-dev-network` ne figurent plus dans les listes Docker. `terraform state list` ne retourne aucune ressource.
 
 L'image `nginx:alpine` reste présente localement, conformément à `keep_locally = true`, même si Terraform ne la suit plus dans l'état.
+
+## 19. Exercices complémentaires
+
+### Exercice 1 — Modifier le nom
+
+La valeur par défaut de `container_name` dans `variables.tf` passe de `tp-iac-nginx` à `tp-iac-web`.
+
+Commandes exécutées avec succès :
+
+```bash
+terraform fmt
+terraform validate
+terraform plan
+```
+
+Le plan affiche `3 to add, 0 to change, 0 to destroy`. L'état est vide après la destruction de l'étape 18 : Terraform prévoit donc la création des trois ressources du projet.
+
+- `docker_container.web` utilisera le nom `tp-iac-web`.
+- `docker_network.app_network` utilisera le nom `tp-iac-web-network`, dérivé de `container_name` dans `main.tf`.
+- `docker_image.nginx` sera de nouveau gérée par Terraform ; l'image `nginx:alpine` est déjà présente localement.
+
+L'output `website_url` prévu reste `http://localhost:8080`, le port n'ayant pas été modifié. Le plan n'a pas été appliqué.

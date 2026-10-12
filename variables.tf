@@ -1,7 +1,7 @@
 variable "container_name" {
   description = "Nom du conteneur Web"
   type        = string
-  default     = "tp-iac-nginx"
+  default     = "tp-iac-web"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9_.-]*$", var.container_name))
