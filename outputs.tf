@@ -4,7 +4,7 @@ output "container_name" {
 }
 
 output "network_name" {
-  description = "Nom du réseau Docker"
+  description = "Nom du réseau Docker choisi"
   value       = docker_network.app_network.name
 }
 

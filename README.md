@@ -247,3 +247,20 @@ Le plan prévoit `3 to add, 0 to change, 0 to destroy`, l'état étant vide et l
 Après confirmation avec `yes`, Terraform affiche `Apply complete! Resources: 3 added, 0 changed, 0 destroyed.` L'output `website_url` vaut `http://localhost:8082`.
 
 La requête HTTP renvoie `200 OK` et la page personnalisée du TP. `docker port` confirme la publication sur `127.0.0.1:8082`.
+
+### Exercice 3 — Ajouter une variable
+
+La variable `network_name`, de type `string`, est ajoutée dans `variables.tf` avec la valeur par défaut `tp-iac-web-network`. La ressource `docker_network.app_network` utilise désormais `name = var.network_name` : le nom du réseau peut être choisi indépendamment du nom du conteneur.
+
+L'output `network_name` référence `docker_network.app_network.name` pour afficher le nom du réseau choisi.
+
+Vérifications exécutées :
+
+```bash
+terraform fmt
+terraform validate
+terraform plan
+terraform output -raw network_name
+```
+
+La configuration est valide. Le plan affiche `No changes`, car la valeur par défaut correspond au nom du réseau déjà déployé. L'output renvoie `tp-iac-web-network`.

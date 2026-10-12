@@ -19,3 +19,9 @@ variable "external_port" {
     error_message = "Le port doit être compris entre 1024 et 65535."
   }
 }
+
+variable "network_name" {
+  description = "Nom du réseau Docker"
+  type        = string
+  default     = "tp-iac-web-network"
+}
