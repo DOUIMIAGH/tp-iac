@@ -30,7 +30,7 @@ Le bloc `networks_advanced` de `docker_container.web` référence `docker_networ
 
 Sa création est automatisée et reproductible à partir du code. Terraform déduit la dépendance du conteneur envers le réseau et crée le réseau avant le conteneur. Il gère également sa suppression lors de la destruction du projet.
 
-**Vérification de la suppression du réseau :** elle sera effectuée lors du nettoyage prévu à l'étape 18.
+**Vérification de la suppression du réseau :** le réseau initial a été remplacé par `tp-iac-dev-network` à l'étape 12. Après la destruction à l'étape 18, `docker network ls` confirme l'absence du réseau du projet.
 
 ## 11. Limiter l'exposition du service
 
@@ -180,3 +180,29 @@ terraform validate
 Ces trois commandes ont été exécutées avec succès localement. Le workflow n'a pas encore été exécuté sur GitHub Actions : les commits n'ont pas encore été poussés.
 
 Le workflow contrôle le formatage et la validité de la configuration. Il n'effectue pas le déploiement Docker : le runner n'est pas configuré pour piloter le moteur Docker de la machine locale.
+
+## 18. Détruire l'infrastructure
+
+Le nettoyage utilise les variables de l'environnement de développement déployé à l'étape 12.
+
+Commandes exécutées :
+
+```bash
+terraform plan -destroy -var-file="dev.tfvars"
+terraform destroy -var-file="dev.tfvars"
+```
+
+Le plan affiche `0 to add, 0 to change, 3 to destroy` et concerne uniquement les trois ressources du projet : `docker_container.web`, `docker_network.app_network` et `docker_image.nginx`. Après confirmation avec `yes`, Terraform affiche `Destroy complete! Resources: 3 destroyed.`
+
+Vérifications effectuées :
+
+```bash
+docker ps -a
+docker network ls
+terraform state list
+docker image inspect nginx:alpine --format '{{.Id}}'
+```
+
+Le conteneur `tp-iac-dev` et le réseau `tp-iac-dev-network` ne figurent plus dans les listes Docker. `terraform state list` ne retourne aucune ressource.
+
+L'image `nginx:alpine` reste présente localement, conformément à `keep_locally = true`, même si Terraform ne la suit plus dans l'état.
