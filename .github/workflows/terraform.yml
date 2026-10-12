@@ -1,0 +1,25 @@
+name: Terraform Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Initialize
+        run: terraform init -backend=false
+
+      - name: Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Validate
+        run: terraform validate

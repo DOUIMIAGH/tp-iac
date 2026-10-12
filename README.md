@@ -166,3 +166,17 @@ make plan
 `make plan` exécute `terraform plan` sans charger `dev.tfvars`. Il utilise donc les valeurs par défaut : `tp-iac-nginx` et le port `8080`. L'environnement déployé utilise encore `tp-iac-dev` et le port `8081` ; le plan propose de remplacer le conteneur et le réseau : `2 to add, 0 to change, 2 to destroy`.
 
 Ce plan n'a pas été appliqué. Le Makefile simplifie les commandes récurrentes ; le plan doit toujours être examiné avant un déploiement.
+
+## 17. Ajouter des contrôles CI avec GitHub Actions
+
+Le workflow `.github/workflows/terraform.yml` est configuré pour les événements `push` et `pull_request`. Il récupère le dépôt, installe Terraform, puis exécute les contrôles suivants :
+
+```bash
+terraform init -backend=false
+terraform fmt -check -recursive
+terraform validate
+```
+
+Ces trois commandes ont été exécutées avec succès localement. Le workflow n'a pas encore été exécuté sur GitHub Actions : les commits n'ont pas encore été poussés.
+
+Le workflow contrôle le formatage et la validité de la configuration. Il n'effectue pas le déploiement Docker : le runner n'est pas configuré pour piloter le moteur Docker de la machine locale.
