@@ -228,3 +228,22 @@ Le plan affiche `3 to add, 0 to change, 0 to destroy`. L'état est vide après l
 - `docker_image.nginx` sera de nouveau gérée par Terraform ; l'image `nginx:alpine` est déjà présente localement.
 
 L'output `website_url` prévu reste `http://localhost:8080`, le port n'ayant pas été modifié. Le plan n'a pas été appliqué.
+
+### Exercice 2 — Modifier le port
+
+La valeur par défaut de `external_port` dans `variables.tf` passe de `8080` à `8082`.
+
+Commandes exécutées :
+
+```bash
+terraform plan
+terraform apply
+curl --fail --silent --show-error --include --max-time 15 http://localhost:8082
+docker port tp-iac-web 80/tcp
+```
+
+Le plan prévoit `3 to add, 0 to change, 0 to destroy`, l'état étant vide et le plan de l'exercice 1 n'ayant pas été appliqué. Le conteneur prévu est `tp-iac-web`, connecté au réseau `tp-iac-web-network`, avec son port interne `80` publié sur `127.0.0.1:8082`.
+
+Après confirmation avec `yes`, Terraform affiche `Apply complete! Resources: 3 added, 0 changed, 0 destroyed.` L'output `website_url` vaut `http://localhost:8082`.
+
+La requête HTTP renvoie `200 OK` et la page personnalisée du TP. `docker port` confirme la publication sur `127.0.0.1:8082`.
