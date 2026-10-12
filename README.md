@@ -149,3 +149,20 @@ Le conteneur est recréé avec un nouvel identifiant, puis la page personnalisé
 - **Revue :** chaque commit regroupe des modifications avec un auteur et un message. `git log` permet de parcourir l'historique et `git show` d'examiner les changements d'un commit.
 - **Collaboration :** les commits permettent de partager les évolutions du projet et de retrouver leur origine. Les branches isolent les modifications avant leur intégration.
 - **Retour sur une modification :** `git revert <commit>` crée un nouveau commit qui annule les changements du commit concerné, tout en conservant l'historique. Pour répercuter un changement de configuration sur l'infrastructure, il faut ensuite examiner `terraform plan` et exécuter `terraform apply`.
+
+## 16. Automatiser avec un Makefile
+
+Le `Makefile` fournit les cibles `init`, `fmt`, `validate`, `plan`, `apply` et `destroy`. Les commandes commencent par une tabulation.
+
+Commandes exécutées avec succès :
+
+```bash
+make init
+make fmt
+make validate
+make plan
+```
+
+`make plan` exécute `terraform plan` sans charger `dev.tfvars`. Il utilise donc les valeurs par défaut : `tp-iac-nginx` et le port `8080`. L'environnement déployé utilise encore `tp-iac-dev` et le port `8081` ; le plan propose de remplacer le conteneur et le réseau : `2 to add, 0 to change, 2 to destroy`.
+
+Ce plan n'a pas été appliqué. Le Makefile simplifie les commandes récurrentes ; le plan doit toujours être examiné avant un déploiement.
