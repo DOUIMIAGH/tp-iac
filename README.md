@@ -264,3 +264,20 @@ terraform output -raw network_name
 ```
 
 La configuration est valide. Le plan affiche `No changes`, car la valeur par défaut correspond au nom du réseau déjà déployé. L'output renvoie `tp-iac-web-network`.
+
+### Exercice 4 — Comprendre l'état
+
+La commande `terraform state list` retourne les trois ressources gérées :
+
+```text
+docker_container.web
+docker_image.nginx
+docker_network.app_network
+```
+
+Les dépendances sont définies par les références dans `main.tf` :
+
+- `docker_container.web` dépend de `docker_image.nginx` grâce à `image = docker_image.nginx.image_id`. L'image fournit les fichiers et le programme Nginx nécessaires au conteneur ; elle doit être disponible avant sa création.
+- `docker_container.web` dépend de `docker_network.app_network` grâce à `networks_advanced.name = docker_network.app_network.name`. Le réseau doit exister pour que Docker puisse y connecter le conteneur.
+
+Terraform déduit automatiquement ces dépendances. Il prépare l'image et crée le réseau avant de créer le conteneur. Aucune dépendance directe n'est déclarée entre l'image et le réseau : leur préparation peut se faire en parallèle.
