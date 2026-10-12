@@ -1,5 +1,64 @@
 # TP — Infrastructure as Code avec Terraform et Docker
 
+## Installation
+
+Installer Terraform version `1.5.0` ou supérieure, Docker Desktop ou Docker Engine, Git et un éditeur de texte. Démarrer Docker Desktop ou le service Docker avant d'utiliser Terraform.
+
+Vérifier les outils :
+
+```bash
+terraform -version
+docker --version
+docker info
+git --version
+```
+
+La commande `docker info` doit fonctionner. Récupérer ensuite le projet et l'initialiser :
+
+```bash
+git clone https://github.com/DOUIMIAGH/tp-iac.git
+cd tp-iac
+terraform init
+```
+
+## Déploiement et tests
+
+La configuration finale utilise le conteneur `tp-iac-web`, le réseau `tp-iac-web-network` et le port local `8082`.
+
+```bash
+terraform fmt -check -recursive
+terraform validate
+terraform plan
+terraform apply
+terraform output
+```
+
+Examiner le plan avant l'application et confirmer avec `yes`. Ouvrir `http://localhost:8082` dans un navigateur ou tester avec :
+
+```bash
+curl http://localhost:8082
+docker ps
+docker network ls
+```
+
+La page personnalisée du dossier `html/` doit apparaître.
+
+## Destruction
+
+Examiner le plan de destruction, puis confirmer la destruction avec `yes` :
+
+```bash
+terraform plan -destroy
+terraform destroy
+docker ps -a
+docker network ls
+terraform state list
+```
+
+Le conteneur et le réseau du projet doivent être absents des listes Docker, et l'état ne doit plus contenir de ressources. L'image Nginx reste localement grâce à `keep_locally = true`.
+
+Le nettoyage a été effectué à la fin du TP. Pour consulter de nouveau la page, il faut redéployer le projet avec les commandes ci-dessus.
+
 ## 9. Personnaliser la page Web
 
 La page `html/index.html` contient un titre personnalisé, un paragraphe de présentation et la date du TP : le 12 octobre 2026.
