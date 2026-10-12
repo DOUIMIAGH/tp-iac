@@ -363,3 +363,39 @@ Supprimer le fichier d'état ne supprime pas les ressources réelles. Terraform 
 - `terraform init` prépare le répertoire de travail : il installe les providers nécessaires et initialise le stockage de l'état.
 - `terraform plan` compare la configuration à l'état connu et aux ressources réelles, puis présente les créations, modifications et suppressions prévues, sans déployer l'infrastructure.
 - `terraform apply` exécute les actions du plan pour créer, modifier ou supprimer les ressources et mettre à jour l'état.
+
+### 2. Quel est le rôle d'un provider Terraform ?
+
+Un provider permet à Terraform de communiquer avec le système qui gère les ressources. Il traduit les déclarations Terraform en opérations de création, de lecture, de modification et de suppression. Dans ce TP, le provider Docker communique avec le moteur Docker pour gérer l'image Nginx, le réseau et le conteneur.
+
+### 3. À quoi sert le fichier `terraform.tfstate` ?
+
+Le fichier d'état conserve la correspondance entre les ressources déclarées dans le code et les objets réellement gérés, notamment leurs identifiants et leurs attributs connus. Terraform l'utilise pour suivre les ressources existantes et déterminer les opérations nécessaires avec la configuration et les informations récupérées auprès du provider. Supprimer ce fichier ne supprime pas les ressources réelles.
+
+### 4. Pourquoi utilise-t-on des variables et des outputs ?
+
+Les variables permettent de choisir des paramètres sans réécrire les ressources, comme le nom du conteneur, le port HTTP ou le nom du réseau. Les outputs exposent des informations utiles après l'application, comme le nom du conteneur déployé et l'URL du serveur. Ils facilitent la réutilisation de la configuration et la consultation des résultats du déploiement.
+
+### 5. Qu'est-ce qu'une dérive de configuration ?
+
+Une dérive est une différence entre la configuration attendue et l'infrastructure réelle, par exemple après une intervention manuelle. Dans ce TP, arrêter le conteneur avec Docker crée une dérive : le conteneur devrait être en cours d'exécution. `terraform plan` permet d'observer les changements proposés pour retrouver la configuration attendue ; l'application de ce plan rétablit le service.
+
+### 6. Quelle différence existe-t-il entre Infrastructure as Code et configuration manuelle ?
+
+L'Infrastructure as Code décrit l'infrastructure dans des fichiers que l'on peut versionner, examiner et utiliser pour automatiser les opérations. Dans ce TP, les ressources Docker sont déclarées dans les fichiers Terraform. Une configuration manuelle consiste à effectuer les opérations directement, par des commandes ou une interface ; il faut alors conserver la trace des actions et les reproduire pour obtenir le même environnement.
+
+### 7. Quel est l'intérêt de Git dans un projet IaC ?
+
+Git conserve les versions du code et l'historique des modifications avec leur auteur et leur message. Il permet de comparer les changements, de les examiner avant intégration, de travailler à plusieurs avec des branches et de revenir sur une modification. Un retour dans le code doit ensuite être examiné avec `terraform plan` et appliqué pour être répercuté sur l'infrastructure.
+
+### 8. Quelle est la différence entre un contrôle CI et un déploiement CD ?
+
+Un contrôle CI vérifie automatiquement les modifications du code, par exemple son formatage et la validité de la configuration. Un déploiement CD applique une version à un environnement pour mettre en service les changements. Dans ce TP, GitHub Actions effectue l'initialisation, le contrôle du formatage et la validation Terraform. Le déploiement Docker est réalisé localement avec `terraform apply`.
+
+### 9. Pourquoi faut-il examiner le plan avant d'appliquer une modification ?
+
+Le plan indique les ressources que Terraform prévoit de créer, de modifier ou de supprimer. Son examen permet de vérifier que les actions correspondent à la modification souhaitée, notamment les noms, les ports et les éventuels remplacements de ressources. Il aide à repérer une suppression ou un changement involontaire avant son application. Dans ce TP, changer de fichier de variables avec le même état peut provoquer le remplacement du conteneur et du réseau.
+
+### 10. Quelles précautions faut-il prendre avec les fichiers d'état et les secrets ?
+
+L'état peut contenir des informations sensibles : il faut restreindre son accès et protéger ses sauvegardes. Les fichiers d'état et les fichiers de variables contenant des secrets doivent être exclus de Git avec `.gitignore`. Les secrets ne doivent pas être inscrits dans le code ni publiés dans les logs ; ils doivent être conservés dans un stockage adapté avec des accès limités. En équipe, un stockage partagé et protégé de l'état, avec un verrouillage adapté, évite les modifications concurrentes. Il ne faut pas supprimer ou modifier manuellement l'état pour nettoyer une infrastructure active.
