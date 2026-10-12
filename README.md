@@ -281,3 +281,28 @@ Les dépendances sont définies par les références dans `main.tf` :
 - `docker_container.web` dépend de `docker_network.app_network` grâce à `networks_advanced.name = docker_network.app_network.name`. Le réseau doit exister pour que Docker puisse y connecter le conteneur.
 
 Terraform déduit automatiquement ces dépendances. Il prépare l'image et crée le réseau avant de créer le conteneur. Aucune dépendance directe n'est déclarée entre l'image et le réseau : leur préparation peut se faire en parallèle.
+
+### Exercice 5 — Détecter une dérive
+
+Le conteneur `tp-iac-web` est initialement en cours d'exécution. Il est arrêté manuellement depuis Docker :
+
+```bash
+docker stop tp-iac-web
+docker inspect --format '{{.State.Status}}' tp-iac-web
+terraform plan
+```
+
+Docker confirme l'état `exited`. Avec le provider Docker `3.9.0`, Terraform propose de recréer `docker_container.web` et affiche `1 to add, 0 to change, 0 to destroy`. L'image et le réseau ne sont pas modifiés. L'arrêt manuel a créé une dérive par rapport à l'état attendu du conteneur.
+
+La restauration et les vérifications sont effectuées avec :
+
+```bash
+terraform apply
+docker inspect --format '{{.Id}} {{.State.Status}}' tp-iac-web
+curl --fail --silent --show-error --include --max-time 15 http://localhost:8082
+terraform plan
+```
+
+Après confirmation avec `yes`, Terraform affiche `Apply complete! Resources: 1 added, 0 changed, 0 destroyed.` Le conteneur est recréé avec un nouvel identifiant et son état est `running`.
+
+La page personnalisée répond de nouveau avec `200 OK` sur `http://localhost:8082`. Le dernier plan affiche `No changes. Your infrastructure matches the configuration.` : la dérive est corrigée.
