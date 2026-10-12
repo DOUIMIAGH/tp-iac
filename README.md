@@ -177,7 +177,7 @@ terraform fmt -check -recursive
 terraform validate
 ```
 
-Ces trois commandes ont été exécutées avec succès localement. Le workflow n'a pas encore été exécuté sur GitHub Actions : les commits n'ont pas encore été poussés.
+Lors de l'étape 17, ces trois commandes ont été exécutées avec succès localement. L'exécution sur GitHub Actions a ensuite été vérifiée à l'exercice 6 de la section 19, après publication des commits.
 
 Le workflow contrôle le formatage et la validité de la configuration. Il n'effectue pas le déploiement Docker : le runner n'est pas configuré pour piloter le moteur Docker de la machine locale.
 
@@ -306,3 +306,26 @@ terraform plan
 Après confirmation avec `yes`, Terraform affiche `Apply complete! Resources: 1 added, 0 changed, 0 destroyed.` Le conteneur est recréé avec un nouvel identifiant et son état est `running`.
 
 La page personnalisée répond de nouveau avec `200 OK` sur `http://localhost:8082`. Le dernier plan affiche `No changes. Your infrastructure matches the configuration.` : la dérive est corrigée.
+
+### Exercice 6 — CI/CD
+
+Le projet est publié dans le dépôt [DOUIMIAGH/tp-iac](https://github.com/DOUIMIAGH/tp-iac).
+
+Commandes utilisées pour relier le dépôt local et publier les commits :
+
+```bash
+git remote add origin git@github.com:DOUIMIAGH/tp-iac.git
+git push -u origin main
+```
+
+Le premier push déclenche le workflow `Terraform Checks`, qui réussit.
+
+Pour tester le contrôle, l'alignement de la ligne `default = 8082` dans `variables.tf` est volontairement modifié. Ce changement est commité puis poussé. Sur GitHub Actions, l'étape `Format Check` échoue et l'étape suivante, `Validate`, est ignorée.
+
+Le fichier est ensuite corrigé avec `terraform fmt -recursive`. Le contrôle local `terraform fmt -check -recursive` réussit. La correction est commitée et poussée ; le workflow réussit de nouveau.
+
+| Vérification | Commit | Résultat GitHub Actions |
+| --- | --- | --- |
+| Premier push | `d6d58f2` | [Réussite](https://github.com/DOUIMIAGH/tp-iac/actions/runs/38248149242) |
+| Défaut de formatage volontaire | `c42d3c3` | [Échec de Format Check](https://github.com/DOUIMIAGH/tp-iac/actions/runs/38248326444) |
+| Correction du formatage | `1a03600` | [Réussite](https://github.com/DOUIMIAGH/tp-iac/actions/runs/38248491161) |
